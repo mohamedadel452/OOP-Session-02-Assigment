@@ -37,7 +37,151 @@ namespace OOP02_SmartDelivery_Classes
     */
     #endregion
 
+    #endregion
 
+
+
+    #region PART 02: Practical QUESTIONS
+
+    #region Shipment Class
+    public class Shipment
+    {
+
+        #region Fields And Properties
+        private string trackingCode;
+        private string description;
+        private decimal weight; // Changed to decimal based on PDF properties table
+        private decimal deliveryFee;
+        public DeliveryAddress Destination { get; set; }
+
+       
+        public string TrackingCode
+        {
+            get { return trackingCode; }
+            private set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    trackingCode = value;
+            }
+        }
+
+        public string Description
+        {
+            get { return description; }
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    description = value;
+            }
+        }
+
+        public decimal Weight
+        {
+            get { return weight; }
+            set
+            {
+                if (value > 0)
+                    weight = value;
+            }
+        }
+
+        public decimal DeliveryFee
+        {
+            get { return deliveryFee; }
+            private set
+            {
+                if (value > 0)
+                    deliveryFee = value;
+            }
+        }
+
+        // Virtual property to allow overriding in derived classes
+        public virtual decimal EstimatedCost
+        {
+            get { return DeliveryFee + (Weight * 5m); }
+        }
+
+        #endregion
+
+        #region Constructors
+        // Constructor 1
+        public Shipment(string trackingCode)
+        {
+            this.trackingCode = string.Empty;
+            this.description = "Unknown";
+            this.weight = 1m;
+            this.deliveryFee = 50m;
+            this.Destination = new DeliveryAddress("Unknown City", "Unknown Street", 0);
+
+            this.TrackingCode = trackingCode;
+        }
+
+        // Constructor 2
+        public Shipment(string trackingCode, string description, decimal weight, decimal deliveryFee, DeliveryAddress destination)
+        {
+            this.trackingCode = string.Empty;
+            this.description = "Unknown";
+            this.weight = 1m;
+            this.deliveryFee = 50m;
+            this.Destination = destination;
+
+            this.TrackingCode = trackingCode;
+            this.Description = description;
+            this.Weight = weight;
+            this.DeliveryFee = deliveryFee;
+        }
+
+        #endregion
+
+        #region Methods
+        public void UpdateDeliveryFee(decimal newFee)
+        {
+            if (newFee > 0)
+            {
+                this.DeliveryFee = newFee;
+            }
+        }
+
+        public virtual void PrintShipment()
+        {
+            Console.WriteLine($"Tracking Code: {TrackingCode}");
+            Console.WriteLine($"Description: {Description}");
+            Console.WriteLine($"Weight: {Weight} KG");
+            Console.WriteLine($"Delivery Fee: {DeliveryFee} EGP");
+            Console.WriteLine($"Destination: {Destination.GetFullAddress()}");
+            Console.WriteLine($"Estimated Cost: {EstimatedCost} EGP");
+        }
+        #endregion
+    }
+    #endregion
+
+    #region DeliveryAddress
+    // 1. DeliveryAddress Struct (Kept as Struct because it's a value object)
+    public struct DeliveryAddress
+    {
+
+        #region Fields And Properties
+        public string City;
+        public string Street;
+        public int BuildingNumber;
+        #endregion
+
+        #region Constructors
+        public DeliveryAddress(string city, string street, int buildingNumber)
+        {
+            City = city;
+            Street = street;
+            BuildingNumber = buildingNumber;
+        }
+        #endregion
+
+        #region Methods
+        public string GetFullAddress()
+        {
+            return $"{BuildingNumber} {Street}, {City}";
+        }
+        #endregion
+    }
 
     #endregion
 
@@ -46,8 +190,7 @@ namespace OOP02_SmartDelivery_Classes
 
 
 
-
-
+    #endregion
 
 
 
