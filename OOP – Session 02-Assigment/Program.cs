@@ -39,8 +39,6 @@ namespace OOP02_SmartDelivery_Classes
 
     #endregion
 
-
-
     #region PART 02: Practical QUESTIONS
 
     #region Shipment Class
@@ -275,7 +273,7 @@ namespace OOP02_SmartDelivery_Classes
 
         public override decimal EstimatedCost
         {
-            get { return base.DeliveryFee + CustomsFee; }
+            get { return base.EstimatedCost + CustomsFee; }
         }
 
         #endregion
@@ -424,9 +422,92 @@ namespace OOP02_SmartDelivery_Classes
 
         static void Main(string[] args)
         {
-
-
+         
             
+            Console.WriteLine("=== Smart Delivery System   ===\n");
+
+            string deliveryCenterName=null;
+
+
+            while (string.IsNullOrWhiteSpace(deliveryCenterName))
+            {
+                Console.Write("Please Enter The Name Of The DeliveryCenter : ");
+                deliveryCenterName=Console.ReadLine();
+
+            }
+
+            DeliveryCenter center = new DeliveryCenter(deliveryCenterName);
+
+
+            #region Read Data form User
+            // 1. Standard Shipment
+            Console.WriteLine("\n--- Enter Standard Shipment Data ---");
+            Console.Write("Tracking Code: "); string t1 = Console.ReadLine();
+            Console.Write("Description: "); string d1 = Console.ReadLine();
+            Console.Write("Weight: "); decimal.TryParse(Console.ReadLine(), out decimal w1);
+            Console.Write("Delivery Fee: "); decimal.TryParse(Console.ReadLine(), out decimal f1);
+            Console.Write("City: "); string c1 = Console.ReadLine();
+            Console.Write("Street: "); string s1 = Console.ReadLine();
+            Console.Write("Building Number: "); int.TryParse(Console.ReadLine(), out int b1);
+
+            DeliveryAddress addr1 = new DeliveryAddress(c1, s1, b1);
+            StandardShipment std = new StandardShipment(t1, d1, w1, f1, addr1);
+            center.AddShipment(std);
+
+            // 2. Express Shipment
+            Console.WriteLine("\n--- Enter Express Shipment Data ---");
+            Console.Write("Tracking Code: "); string t2 = Console.ReadLine();
+            Console.Write("Description: "); string d2 = Console.ReadLine();
+            Console.Write("Weight: "); decimal.TryParse(Console.ReadLine(), out decimal w2);
+            Console.Write("Delivery Fee: "); decimal.TryParse(Console.ReadLine(), out decimal f2);
+            Console.Write("Extra Fee: "); decimal.TryParse(Console.ReadLine(), out decimal x2);
+            Console.Write("City: "); string c2 = Console.ReadLine();
+            Console.Write("Street: "); string s2 = Console.ReadLine();
+            Console.Write("Building Number: "); int.TryParse(Console.ReadLine(), out int b2);
+
+            DeliveryAddress addr2 = new DeliveryAddress(c2, s2, b2);
+            ExpressShipment exp = new ExpressShipment(t2, d2, w2, f2, addr2, x2);
+            center.AddShipment(exp);
+
+            // 3. International Shipment
+            Console.WriteLine("\n--- Enter International Shipment Data ---");
+            Console.Write("Tracking Code: "); string t3 = Console.ReadLine();
+            Console.Write("Description: "); string d3 = Console.ReadLine();
+            Console.Write("Weight: "); decimal.TryParse(Console.ReadLine(), out decimal w3);
+            Console.Write("Delivery Fee: "); decimal.TryParse(Console.ReadLine(), out decimal f3);
+            Console.Write("Destination Country: "); string dc3 = Console.ReadLine();
+            Console.Write("Customs Fee: "); decimal.TryParse(Console.ReadLine(), out decimal cu3);
+            Console.Write("City: "); string c3 = Console.ReadLine();
+            Console.Write("Street: "); string s3 = Console.ReadLine();
+            Console.Write("Building Number: "); int.TryParse(Console.ReadLine(), out int b3);
+
+            DeliveryAddress addr3 = new DeliveryAddress(c3, s3, b3);
+            InternationalShipment intl = new InternationalShipment(t3, d3, w3, f3, addr3, dc3, cu3);
+            center.AddShipment(intl);
+
+            #endregion
+
+
+            // Print all
+            center.PrintAllShipments();
+
+            // Search 
+            Console.WriteLine("\nSearching for EXP-200...");
+            Shipment found = center["EXP-200"];
+            if (found != null)
+                Console.WriteLine($"Found! {found.Description}");
+            else
+                Console.WriteLine("Not Found.");
+
+            // Remove 
+            Console.WriteLine("\nRemoving STD-100...");
+            bool isRemoved = center.RemoveShipment("STD-100");
+            Console.WriteLine(isRemoved ? "Successfully removed." : "Failed to remove.");
+
+            // Print all again
+            center.PrintAllShipments();
+
+
         }
 
     }
