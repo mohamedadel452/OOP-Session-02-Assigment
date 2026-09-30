@@ -422,8 +422,8 @@ namespace OOP02_SmartDelivery_Classes
 
         static void Main(string[] args)
         {
-         
-            
+
+            #region In Main
             Console.WriteLine("=== Smart Delivery System   ===\n");
 
             string deliveryCenterName=null;
@@ -507,6 +507,8 @@ namespace OOP02_SmartDelivery_Classes
             // Print all again
             center.PrintAllShipments();
 
+
+            #endregion 
 
         }
 
