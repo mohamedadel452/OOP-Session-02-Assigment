@@ -155,7 +155,7 @@ namespace OOP02_SmartDelivery_Classes
     }
     #endregion
 
-    #region DeliveryAddress
+    #region DeliveryAddress Struct
     // 1. DeliveryAddress Struct (Kept as Struct because it's a value object)
     public struct DeliveryAddress
     {
@@ -301,9 +301,117 @@ namespace OOP02_SmartDelivery_Classes
 
     #endregion
 
+    #region DeliveryCenter Class
+    public class DeliveryCenter
+    {
+
+        #region Fields And Properties
+
+        public string CenterName { get; set; }
+
+        // Private array for maximum 20 shipments
+        private Shipment[] shipments = new Shipment[20];
 
 
 
+        #endregion
+
+        #region Constructors
+        public DeliveryCenter(string centerName)
+        {
+            CenterName = centerName;
+        }
+        #endregion
+
+        #region Indexers
+
+
+        #region Integer indexer
+        public Shipment this[int index]
+        {
+            get
+            {
+                if (index >= 0 && index < shipments.Length)
+                    return shipments[index];
+                return null; // returning null instead of default because it's a class
+            }
+            set
+            {
+                if (index >= 0 && index < shipments.Length)
+                    shipments[index] = value;
+            }
+        }
+        #endregion
+
+        #region String indexer (search by tracking code)
+        public Shipment this[string trackingCode]
+        {
+            get
+            {
+                for (int i = 0; i < shipments.Length; i++)
+                {
+                    if (shipments[i] != null && shipments[i].TrackingCode == trackingCode)
+                        return shipments[i];
+                }
+                return null;
+            }
+        }
+
+        #endregion
+
+
+        #endregion
+
+        #region Methods
+        public bool AddShipment(Shipment shipment)
+        {
+            if (shipment == null) return false;
+
+            for (int i = 0; i < shipments.Length; i++)
+            {
+                if (shipments[i] == null)
+                {
+                    shipments[i] = shipment;
+                    return true;
+                }
+            }
+            return false; // Delivery center is full
+        }
+
+        public bool RemoveShipment(string trackingCode)
+        {
+            for (int i = 0; i < shipments.Length; i++)
+            {
+                if (shipments[i] != null && shipments[i].TrackingCode == trackingCode)
+                {
+                    shipments[i] = null; // Removing it by unlinking the object (GC will collect it)
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void PrintAllShipments()
+        {
+            Console.WriteLine($"\n=== {CenterName} Delivery Center Shipments ===");
+            bool empty = true;
+            for (int i = 0; i < shipments.Length; i++)
+            {
+                if (shipments[i] != null)
+                {
+                    shipments[i].PrintShipment();
+                    empty = false;
+                }
+            }
+            if (empty)
+                Console.WriteLine("No shipments found.");
+        }
+
+        #endregion
+
+    }
+
+    #endregion
 
 
     #endregion
