@@ -185,6 +185,122 @@ namespace OOP02_SmartDelivery_Classes
 
     #endregion
 
+    #region Derived Classes
+
+    #region StandardShipment
+
+    public class StandardShipment : Shipment
+    {
+
+        #region Constructor
+        // Constructor chaining: passing values to the base class constructor
+        public StandardShipment(string trackingCode, string description, decimal weight, decimal deliveryFee, DeliveryAddress destination)
+            : base(trackingCode, description, weight, deliveryFee, destination)
+        {
+        }
+        #endregion
+    }
+
+
+    #endregion
+
+    #region ExpressShipment
+    public class ExpressShipment : Shipment
+    {
+
+        #region Fields And Properties
+        private decimal extraFee;
+
+        public decimal ExtraFee
+        {
+            get { return extraFee; }
+            set
+            {
+                if (value >= 0)
+                    extraFee = value;
+            }
+        }
+
+
+        // Override the EstimatedCost
+        public override decimal EstimatedCost
+        {
+            get { return base.EstimatedCost + ExtraFee; }
+        }
+
+        #endregion
+
+        #region Constructors
+        public ExpressShipment(string trackingCode, string description, decimal weight, decimal deliveryFee, DeliveryAddress destination, decimal extraFee)
+            : base(trackingCode, description, weight, deliveryFee, destination)
+        {
+            ExtraFee = extraFee;
+        }
+        #endregion
+
+        #region Methods
+    
+        #endregion
+    }
+
+    #endregion
+
+    #region InternationalShipment
+    public class InternationalShipment : Shipment
+    {
+
+        #region Fields And Properties
+        private string destinationCountry;
+        private decimal customsFee;
+
+        public string DestinationCountry
+        {
+            get { return destinationCountry; }
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    destinationCountry = value;
+            }
+        }
+
+        public decimal CustomsFee
+        {
+            get { return customsFee; }
+            set
+            {
+                if (value >= 0)
+                    customsFee = value;
+            }
+        }
+
+        public override decimal EstimatedCost
+        {
+            get { return base.DeliveryFee + CustomsFee; }
+        }
+
+        #endregion
+
+        #region Constructors
+        public InternationalShipment(string trackingCode, string description, decimal weight, decimal deliveryFee, DeliveryAddress destination, string destinationCountry, decimal customsFee)
+               : base(trackingCode, description, weight, deliveryFee, destination)
+        {
+            DestinationCountry = destinationCountry;
+            CustomsFee = customsFee;
+        }
+
+        #endregion
+
+        #region Methods
+
+        #endregion
+    }
+
+    #endregion
+
+
+
+    #endregion
+
 
 
 
