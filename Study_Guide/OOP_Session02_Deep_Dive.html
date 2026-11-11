@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OOP Session 02: دليل الغوص العميق (Class / Inheritance / Access Modifiers)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F4F6;--card:#FFFFFF;--ink:#14213D;--muted:#586373;--line:#D5DAE1;
+  --bad:#B3261E;--bad-bg:#FBEAE8;
+  --good:#0B7A69;--good-bg:#E3F3EF;
+  --warn:#8A5300;--warn-bg:#FBF1DD;
+  --myth:#4B3F91;--myth-bg:#ECE9F8;
+  --idea:#1F5FA8;--idea-bg:#E6EFFA;
+  --code:#0F1B2D;--code-ink:#E6EDF7;
+}
+:root{color-scheme:light dark}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#0D1422;--card:#131C2E;--ink:#E8EDF5;--muted:#9AA6B8;--line:#26324A;
+    --bad:#FF8F86;--bad-bg:#2B1618;
+    --good:#4FD1B8;--good-bg:#10261F;
+    --warn:#F0B95A;--warn-bg:#2A2010;
+    --myth:#B3A8F5;--myth-bg:#1E1B36;
+    --idea:#7DB6F2;--idea-bg:#122238;
+    --code:#0A101C;--code-ink:#E6EDF7;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:1rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"IBM Plex Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif;
+  font-size:17px;line-height:1.95}
+.wrap{display:grid;grid-template-columns:14.5rem minmax(0,48rem);gap:3rem;
+  max-width:68rem;margin:0 auto;padding:2rem 1.25rem 5rem}
+nav.toc{position:sticky;top:1rem;align-self:start;font-size:.9rem;line-height:1.7;
+  max-height:calc(100vh - 2rem);overflow:auto;padding-inline-end:.5rem}
+nav.toc b{display:block;margin-bottom:.5rem;color:var(--muted);font-weight:500}
+nav.toc a{display:block;padding:.2rem .6rem;color:var(--ink);text-decoration:none;
+  border-inline-start:2px solid var(--line)}
+nav.toc a:hover,nav.toc a:focus-visible{border-color:var(--ink);outline:none;background:var(--card)}
+nav.toc a span{font-family:Consolas,Menlo,monospace;color:var(--muted);margin-inline-end:.4rem;
+  direction:ltr;unicode-bidi:isolate}
+main{min-width:0}
+h1{font-size:2.1rem;line-height:1.35;margin:.2rem 0 .6rem;font-weight:700}
+h2{font-size:1.55rem;line-height:1.4;margin:0;font-weight:700}
+h3{font-size:1.15rem;margin:2.2rem 0 .4rem;font-weight:700}
+p{margin:.7rem 0}
+.lede{font-size:1.1rem;color:var(--muted);margin-bottom:1.5rem}
+section{margin-top:3.5rem;padding-top:2rem;border-top:1px solid var(--line)}
+.risk-h{display:flex;align-items:baseline;gap:.9rem;margin-bottom:1rem;flex-wrap:wrap}
+.tag{font-size:.9rem;border:1.5px solid var(--ink);padding:.05rem .6rem;border-radius:4px;flex:none}
+.en{direction:ltr;unicode-bidi:isolate;font-weight:700}
+code{font-family:Consolas,Menlo,"Courier New",monospace;font-size:.88em;direction:ltr;
+  unicode-bidi:isolate;background:var(--card);border:1px solid var(--line);padding:.05rem .35rem;border-radius:4px}
+pre{direction:ltr;text-align:left;background:var(--code);color:var(--code-ink);margin:.9rem 0 1.2rem;
+  padding:2.2rem 1rem .9rem;border-radius:6px;overflow-x:auto;position:relative;
+  font-family:Consolas,Menlo,"Courier New",monospace;font-size:.84rem;line-height:1.65;tab-size:2}
+pre::before{content:attr(data-l);position:absolute;top:0;left:0;right:0;padding:.25rem 1rem;
+  font-family:"IBM Plex Sans Arabic",Tahoma,sans-serif;font-size:.78rem;font-weight:500;direction:rtl;text-align:right}
+pre.bad{border-top:4px solid var(--bad)}pre.bad::before{background:var(--bad-bg);color:var(--bad)}
+pre.good{border-top:4px solid var(--good)}pre.good::before{background:var(--good-bg);color:var(--good)}
+pre.neutral{border-top:4px solid var(--idea)}pre.neutral::before{background:var(--idea-bg);color:var(--idea)}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+.note{margin:1rem 0;padding:.7rem 1rem;border-radius:4px;border-inline-start:5px solid;font-size:.98rem;line-height:1.85}
+.note>b:first-child{display:block;font-size:.9rem;margin-bottom:.15rem}
+.note p{margin:.3rem 0}
+.analogy{background:var(--idea-bg);border-color:var(--idea)}.analogy>b:first-child{color:var(--idea)}
+.why{background:var(--card);border-color:var(--ink)}
+.myth{background:var(--myth-bg);border-color:var(--myth)}.myth>b:first-child{color:var(--myth)}
+.prod{background:var(--bad-bg);border-color:var(--bad)}.prod>b:first-child{color:var(--bad)}
+.cost{background:var(--warn-bg);border-color:var(--warn)}.cost>b:first-child{color:var(--warn)}
+.fix{background:var(--good-bg);border-color:var(--good)}.fix>b:first-child{color:var(--good)}
+.senior{background:var(--card);border:1.5px dashed var(--ink);border-inline-start:5px solid var(--ink)}
+.tw{overflow-x:auto;margin:1rem 0;border:1px solid var(--line);border-radius:6px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:.93rem;line-height:1.7}
+th,td{padding:.55rem .8rem;text-align:start;vertical-align:top;border-bottom:1px solid var(--line)}
+th{background:var(--paper);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+ul,ol{padding-inline-start:1.4rem;margin:.6rem 0}
+li{margin:.3rem 0}
+a{color:var(--idea)}
+a:focus-visible{outline:2px solid var(--idea);outline-offset:2px}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.6rem;margin:1rem 0}
+.legend .note{margin:0;font-size:.9rem;padding:.5rem .8rem}
+.res li{margin:.55rem 0}
+.res small{display:block;color:var(--muted);line-height:1.6}
+.res a.u{direction:ltr;unicode-bidi:isolate;word-break:break-all;font-size:.82rem;display:inline-block}
+details{margin:.8rem 0;border:1px solid var(--line);border-radius:6px;background:var(--card);padding:.2rem 1rem}
+summary{cursor:pointer;font-weight:700;padding:.5rem 0}
+summary:focus-visible{outline:2px solid var(--idea);outline-offset:2px}
+footer{margin-top:4rem;color:var(--muted);font-size:.88rem;border-top:1px solid var(--line);padding-top:1rem}
+@media (max-width:60rem){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:1rem}
+  nav.toc{position:static;max-height:none}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:12pt}
+  nav.toc{display:none}.wrap{display:block}
+  section{break-inside:auto}pre{white-space:pre-wrap}
+  details{border:0}details>*{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="toc" aria-label="فهرس المحتوى">
+  <b>الفهرس</b>
+  <a href="#intro">مقدمة وخريطة الشرايح</a>
+  <a href="#class"><span>1</span>Class كـ Reference Type</a>
+  <a href="#alias"><span>2</span>الـ Aliasing بالتفصيل</a>
+  <a href="#cvs"><span>3</span>Class مقابل Struct: Quiz محلّل</a>
+  <a href="#inherit"><span>4</span>Inheritance</a>
+  <a href="#ctorinherit"><span>5</span>Constructors مع Inheritance</a>
+  <a href="#access"><span>6</span>Access Modifiers (الستة كاملين)</a>
+  <a href="#slide-notes">ملاحظات على الشرايح</a>
+  <a href="#interview">أسئلة مقابلات</a>
+  <a href="#exercises">تمارين</a>
+  <a href="#cheat">Cheat Sheet</a>
+  <a href="#resources">المصادر</a>
+  <a href="#next">الخطوة الجاية</a>
+</nav>
+
+<main>
+
+<section id="intro" style="border:0;margin-top:0;padding-top:0">
+<h1>OOP Session 02<br>دليل الغوص العميق</h1>
+<p class="lede">مبني على 31 شريحة (Class، Inheritance، Access Modifiers). السيشن دي كانت دقيقة جدًا في أغلب تفاصيلها التقنية (خصوصًا جداول الـ Access Modifiers)، فالملف هنا بيركّز على "ليه الآلية اتصممت كده" و"إيه الفخ اللي هتقابله فعلًا"، أكتر من تصحيح أخطاء، لأن الأخطاء قليلة هنا.</p>
+
+<h3>خريطة الشرايح مقابل أقسام الملف</h3>
+<div class="tw"><table>
+<tr><th>الشرايح</th><th>الموضوع</th><th>القسم</th></tr>
+<tr><td>3 – 8</td><td>Class: التعريف، خطوات إنشاء الـ object، الـ Reference Behaviour</td><td><a href="#class">1</a>، <a href="#alias">2</a></td></tr>
+<tr><td>9 – 10</td><td>Quick Think: null reference، اختفاء الـ default constructor</td><td><a href="#class">1</a></td></tr>
+<tr><td>11 – 12</td><td>Class vs Struct + Quiz بـ 8 أمثلة</td><td><a href="#cvs">3</a></td></tr>
+<tr><td>13 – 18</td><td>Inheritance: التعريف، الأنواع، مثال Person/Student/Employee</td><td><a href="#inherit">4</a></td></tr>
+<tr><td>19 – 20</td><td>Constructors and Inheritance: ترتيب التنفيذ</td><td><a href="#ctorinherit">5</a></td></tr>
+<tr><td>21 – 30</td><td>الستة Access Modifiers، بدون وبمع inheritance، جوه/بره الـ assembly</td><td><a href="#access">6</a></td></tr>
+</table></div>
+
+<h3>دليل الألوان (نفس نظام سيشن 1)</h3>
+<div class="legend">
+  <div class="note analogy"><b>تشبيه</b>الفكرة في مثال من الواقع.</div>
+  <div class="note why"><b>الميكانيزم</b>إيه اللي بيحصل تحت السطح.</div>
+  <div class="note myth"><b>مفهوم غلط</b>اللي الناس بتبسّطه أو تفهمه غلط.</div>
+  <div class="note prod"><b>في الإنتاج</b>الباج أو المشكلة الفعلية.</div>
+  <div class="note cost"><b>Trade-off</b>تكلفة الحل وحدوده.</div>
+  <div class="note fix"><b>الحل</b>الاتجاه الصح.</div>
+  <div class="note senior"><b>ملاحظة سينيور</b>حاجة زيادة تفرّق.</div>
+</div>
+
+<div class="note cost"><b>ملاحظة عن الأكواد</b>
+<p>الأكواد مكتوبة بعناية لكن <b>ماتجرّبتش على compiler</b> في بيئة الكتابة (مفيش <span class="en">dotnet</span> هنا). جرّب الأمثلة على sharplab.io. وحيثما احتجت أتأكد من قاعدة لغوية دقيقة (زي قاعدة <code>protected</code> اللي في القسم 6) رجعت لمستندات Microsoft الرسمية بالبحث، ومصادرها مذكورة في قسم المصادر.</p></div>
+</section>
+
+<!-- ===================== 1. CLASS ===================== -->
+<section id="class">
+<div class="risk-h"><span class="tag">شرايح 3 – 10</span><h2>1) Class كـ Reference Type</h2></div>
+
+<div class="note analogy"><b>تشبيه</b>الـ reference زي <b>عنوان شقة على ورقة</b>. الورقة (المتغير) بتتخزن في جيبك (الـ stack)، لكن الشقة نفسها (الـ object) في مبنى بعيد (الـ heap). لو صورت الورقة ووزعتها على صحابك، كل واحد فيهم عنده عنوان الشقة نفسها: أي حد يدخلها ويغيّر فيها، الكل هيشوف التغيير لأن الشقة واحدة.</div>
+
+<h3>1.1) الأربع خطوات (الشريحة 6): دقيقة، لكن فيها تفصيلة تستاهل توضيح</h3>
+<p>الشريحة رتّبت الخطوات صح:</p>
+<ol>
+<li>حجز البايتات المطلوبة على الـ Heap.</li>
+<li>تصفيرها لقيم الـ default بتاعة النوع.</li>
+<li>نداء الـ constructor (المعرّف من المستخدم، أو الـ default لو ما فيش).</li>
+<li>تعيين عنوان الـ object للـ reference.</li>
+</ol>
+<div class="note why"><b>الميكانيزم الدقيق للخطوة 1: مش زي <code>malloc</code></b>
+<p>الـ heap بتاع .NET (Gen0 تحديدًا) بيشتغل بـ <b>bump allocator</b>: مؤشر واحد بيأشر على أول بايت فاضي، والحجز هو مجرد <code>pointer += size</code>. عشان كده حجز object جديد في .NET من أسرع العمليات (أسرع من C++ <code>new</code> بكتير غالبًا)، لأنه مش بيدوّر على "فراغ مناسب" زي الـ heap التقليدي. الجزء المكلف هو <b>الـ Garbage Collection</b> اللي بييجي بعدين، مش الحجز نفسه.</p></div>
+
+<h3>1.2) تصحيح تفصيلة: "4 | 8 bytes ... Depend on OS"</h3>
+<div class="note myth"><b>تصحيح دقيق</b>
+<p>مش الـ OS هو اللي بيحدد حجم الـ reference، لكن <b>معمارية الـ process</b> (x86 مقابل x64/ARM64) اللي التطبيق شغّال عليها. تقدر تشغّل تطبيق x86 (32-bit) على ويندوز 64-bit، وهيفضل الـ reference حجمه 4 bytes. الحجم الفعلي هو <code>IntPtr.Size</code>: <b>4</b> على x86، <b>8</b> على x64 وARM64. الشريحة قصدها صح، بس المصطلح الدقيق "target platform / process bitness" مش "OS".</p></div>
+
+<h3>1.3) العناوين في الشريحة (<code>0x001</code>) تبسيط تعليمي، وفيه فخ حقيقي وراه</h3>
+<div class="note myth"><b>مفهوم غلط خطير: "العنوان ثابت"</b>
+<p>الشرايح 6-8 بترسم العنوان (<code>0x001</code>, <code>0x002</code>) وكأنه ثابت طول عمر الـ object. في الواقع .NET بيستخدم <b>Generational Compacting Garbage Collector</b>: لما الـ GC يشتغل، ممكن <b>ينقل الـ objects فعليًا في الذاكرة</b> (عشان يقفل الفراغات اللي خلفتها الـ objects اللي اتشالت، وده اسمه compaction). العنوان اللي الـ reference بيشاور عليه بيتحدّث تلقائيًا وقت الـ GC، فالكود بتاعك مش حاسس بالحركة دي، لكن العنوان الفعلي في الميموري <b>بيتغيّر</b>.</p></div>
+<div class="note prod"><b>في الإنتاج</b>ده بالظبط سبب وجود <code>fixed</code> statement و<code>GCHandle.Alloc(obj, GCHandleType.Pinned)</code>: لو محتاج تبعت عنوان object لكود native (P/Invoke) وتسيبه شغال لفترة، لازم "تثبّت" الـ object (pin) عشان الـ GC ميحركوش وانت بتستخدم عنوانه، وإلا العنوان اللي بعته لكود C يبقى غلط بعد أول GC. ده باج نادر جدًا لكن كارثي لما يحصل (memory corruption).</div>
+
+<h3>1.4) الفرق بين تخزين الـ string والـ int (الشريحة 7)</h3>
+<p>الشريحة دي دقيقة جدًا ومهمة: <code>Name</code> (string، reference type) بيتخزن كـ <b>عنوان</b> جوه الـ object، والـ string الفعلي object منفصل على الـ heap. أما <code>Age</code> (int، value type) بيتخزن <b>مباشرة جوه بايتات الـ object نفسه</b>. ده تطبيق حي لتفرقة القسم 2 من سيشن 1 (فين الـ value type بيتخزن).</p>
+<pre class="neutral" data-l="نفس الفكرة، أعمق شوية"><code>class Student { public string Name; public int Age; }
+// حجم الـ object تقريبًا: 16 (header) + 8 (Name كـ reference) + 4 (Age) [+ padding]
+// الـ "Ahmed" نفسها: object منفصل على الـ heap، وممكن يتشارك فيه أكتر من متغير
+// (.NET بيعمل "string interning" لبعض الـ string literals، فمرجعين لنفس النص الحرفي
+//  ممكن يشاوروا لنفس الـ object فعلًا)
+</code></pre>
+
+<h3>1.5) الـ default constructor بيختفي (الشريحة 10): ربط بسيشن 1</h3>
+<p>الشريحة دي بتوضح بالظبط الفخ اللي شرحناه في سيشن 1 (قسم 3.2)، لكن بصريًا وواضح جدًا. الإضافة هنا:</p>
+<div class="note senior"><b>ملاحظة سينيور</b>
+<p>الحل التاني في الشريحة ("pass the required parameter") بيحل الكومبايل إيرور، لكن مش دايمًا الحل الصح. لو الـ class بيتنشأ في 20 مكان في الكود، إضافة parameter إجباري معناها تعديل الـ 20 مكان. الحل الأنسب غالبًا الحل الأول (parameterless constructor) + إجبار الحقول المهمة بـ <code>required</code> (C# 11) لو Framework حديث، عشان الكومبايلر يجبرك تعيّنها وقت الإنشاء من غير ما تحتاج constructor بمعاملات.</p></div>
+
+<h3>1.6) "Objects are stored on the heap" (الشريحة 4): دقيقة بس عمّمها الفهم الشائع</h3>
+<div class="note myth"><b>تذكير من سيشن 1</b>
+<p>الجملة دي صح <b>للـ class</b> دايمًا. لكن لو نسيت وطبّقتها على struct هتقع في نفس الفخ اللي صححناه في سيشن 1 (القسم 2.2): الـ struct بيتخزن inline في اللي شايله، مش دايمًا heap. الشريحة هنا بتتكلم عن class فقط، وده صحيح 100%.</p></div>
+</section>
+
+<!-- ===================== 2. ALIASING ===================== -->
+<section id="alias">
+<div class="risk-h"><span class="tag">شريحة 8</span><h2>2) الـ Aliasing بالتفصيل</h2></div>
+
+<div class="note analogy"><b>تشبيه</b>مستند Google Docs بلينك واحد اتبعت لشخصين. مش نسختين من المستند، هو <b>نفس المستند</b>. أي حد يكتب فيه، التاني بيشوف التغيير لحظيًا.</div>
+
+<h3>2.1) تحليل الشريحة 8 خطوة بخطوة</h3>
+<p>الشريحة أثبتت بالرسم: <code>std02 = std01</code> بتخلي المتغيرين يأشروا على نفس عنوان الـ heap (<code>0x001</code>). أي تعديل بعد كده من أي طرف بيبان في الطرف التاني. ده مش "باج"، ده <b>السلوك الرسمي المتوقع</b> للـ reference types.</p>
+
+<h3>2.2) امتى ده مقصود، وامتى ده باج؟</h3>
+<div class="tw"><table>
+<tr><th>الموقف</th><th>مقصود ولا باج؟</th></tr>
+<tr><td>تمرير object كبير لـ method عشان تتجنب نسخه</td><td>مقصود (ده أصلًا سبب من أسباب استخدام class بدل struct)</td></tr>
+<tr><td>Cache بيرجّع نفس الـ object لطلبين مختلفين، وواحد بيعدّل فيه</td><td>باج: التعديل بيسرّب لكل مستخدمي الـ cache</td></tr>
+<tr><td>بتضيف نفس الـ object مرتين لـ Lists مختلفة ظنًا منك إنها نسخ</td><td>باج: تعديل عبر list واحد بيأثر على التاني</td></tr>
+<tr><td>method بتاخد parameter وتعدّل فيه ظنًا إنها نسخة محلية</td><td>باج: الأصل اتعدّل من غير قصد</td></tr>
+</table></div>
+
+<pre class="bad" data-l="باج كلاسيكي: نسيان إن التعديل بيوصل للأصل"><code>public List&lt;Student&gt; GetTopStudents(List&lt;Student&gt; all)
+{
+    var top = all.Where(s =&gt; s.Gpa &gt; 3.5).ToList();
+    foreach (var s in top) s.Rank = "Top";   // 💥 بتعدّل نفس الـ objects اللي في all
+    return top;
+}
+// الكود اللي نادى الـ method ومعاه all هيلاقي طلبته اتغيّرت هي كمان من غير ما يطلب</code></pre>
+<div class="note fix"><b>الحل</b>لو عايز تمنع التسرب، اعمل نسخة صريحة (deep أو shallow حسب الحاجة)، أو ارجّع نوع immutable/DTO منفصل بدل الـ entity الأصلي.</div>
+
+<h3>2.3) <code>==</code> على الـ class: مقارنة عناوين مش محتوى</h3>
+<pre class="neutral" data-l="سلوك الـ == الافتراضي على reference types"><code>var s1 = new Student { Name = "Ali" };
+var s2 = new Student { Name = "Ali" };
+Console.WriteLine(s1 == s2);          // False: عنوانين مختلفين، حتى لو نفس المحتوى
+Console.WriteLine(s1 == s1);          // True: نفس العنوان
+Console.WriteLine(ReferenceEquals(s1, s2));  // False، نفس نتيجة ==</code></pre>
+<div class="note senior"><b>ملاحظة سينيور</b>
+<p>ده هيتوسّع لما نوصل لموضوع الـ Equality (مذكور في "الخطوة الجاية"). النقطة المهمة دلوقتي: افتراضيًا، مقارنة اتنين objects بـ <code>==</code> أو <code>.Equals()</code> بتقارن <b>العناوين</b> مش المحتوى، إلا لو الـ class نفسه عمل override للـ <code>Equals</code>/<code>==</code> (زي ما الـ <code>string</code> بيعمل، وعشان كده <code>"a" == "a"</code> بترجع true رغم إنه reference type).</p></div>
+</section>
+
+<!-- ===================== 3. CLASS VS STRUCT QUIZ ===================== -->
+<section id="cvs">
+<div class="risk-h"><span class="tag">شرايح 11 – 12</span><h2>3) Class مقابل Struct: تحليل الـ Quiz</h2></div>
+
+<div class="note analogy"><b>تشبيه</b>اسأل نفسك: "لو نسخت الحاجة دي، هل النسخة المفروض تكون <b>مستقلة</b> (زي رقم) ولا <b>نفس الحاجة</b> (زي حساب بنكي)؟" لو الإجابة "لازم تفضل مربوطة بالأصل"، فهي class.</div>
+
+<h3>3.1) جدول الشريحة 11: تصحيح بسيط</h3>
+<div class="note myth"><b>تصحيح</b>
+<p>الجدول بيقول عن الـ struct "Default Constructor: Always exists (parameterless constructor)". ده صح كـ <b>سلوك نهائي</b> (فعلًا دايمًا فيه طريقة تعمل بيها instance فاضي)، لكن قدرتك <b>ككاتب كود</b> على كتابة parameterless constructor بنفسك بقت متاحة من C# 10 بس (شرحناها بالتفصيل في سيشن 1، قسم 3.4). قبل كده الـ compiler هو اللي بيوفرها ضمنيًا ومتقدرش تكتب واحدة بنفسك.</p></div>
+
+<h3>3.2) تحليل الثمانية أمثلة (الشريحة 12): ليه كل إجابة صح؟</h3>
+<div class="tw"><table>
+<tr><th>المثال</th><th>الإجابة</th><th>السبب الحقيقي</th></tr>
+<tr><td>RGB Color</td><td>Struct</td><td>3 أرقام صغار، immutable منطقيًا (اللون نفسه ما بيتغيرش، بتستبدله بلون تاني)، وحجمها صغير جدًا (12 bytes تقريبًا)</td></tr>
+<tr><td>GPS Coordinate</td><td>Struct</td><td>رقمين (lat, long)، قيمة وليها هوية، وimmutable</td></tr>
+<tr><td>Shopping Cart</td><td>Class</td><td><b>مش عن الحجم</b>؛ العربة بتتغيّر باستمرار (إضافة/حذف عناصر) وممكن تتشارك بين أجزاء من الكود (الـ UI بيعرضها، الـ checkout بيقرأها). لو كانت struct، كل تمرير للعربة لـ method كان هيعمل نسخة، والتعديل في النسخة مش هيوصل للأصل: العربة الحقيقية للمستخدم هتفضل فاضية!</td></tr>
+<tr><td>Car</td><td>Class</td><td>الـ Car ليها <b>هوية</b> (نفس العربية بالظبط، مش عربية تانية بنفس المواصفات)، وحالتها بتتغيّر (سرعة، بنزين) وبتتحرك في السيستم (تتباع، تتصلّح) وكل واحد من دول محتاج يشاور على <b>نفس</b> العربية</td></tr>
+<tr><td>Bank Account</td><td>Class</td><td><b>الأخطر في اللستة.</b> شوف الصندوق تحت</td></tr>
+<tr><td>Rectangle (Width, Height)</td><td>Struct</td><td>مجرد قياسين، بيتحسب منها مساحة، ومفيش "هوية" للمستطيل: مستطيلين بنفس الأبعاد هما نفس القيمة فعليًا</td></tr>
+<tr><td>Student</td><td>Class</td><td>ليه هوية (رقم قيد)، وحالته بتتغيّر (درجات، تسجيل مواد) طول فترة دراسته، ومحتاج كل جزء من نظام الجامعة (تسجيل، مصاريف، امتحانات) يتعامل مع <b>نفس</b> الطالب</td></tr>
+<tr><td>Size (Width, Height)</td><td>Struct</td><td>زي الـ Rectangle بالظبط: قيمة صغيرة بلا هوية</td></tr>
+</table></div>
+
+<div class="note prod"><b>في الإنتاج: ليه Bank Account لازم يكون class؟</b>
+<pre class="bad" data-l="لو BankAccount كان struct، ده اللي هيحصل"><code>struct BankAccount { public decimal Balance; }   // ❌ فرضًا
+
+void ApplyInterest(BankAccount acc)
+{
+    acc.Balance *= 1.05m;      // بيعدّل نسخة محلية بس
+}                              // النسخة بتضيع لما الـ method تخلص
+
+var myAccount = new BankAccount { Balance = 1000 };
+ApplyInterest(myAccount);
+Console.WriteLine(myAccount.Balance);   // لسه 1000! الفايدة "اتحسبت" ومحدش استفاد بيها</code></pre>
+<p>لو الحساب البنكي struct، كل مرة تتمرر لـ method أو تتحط في list، بتاخد <b>نسخة مستقلة</b>. تحديثات الرصيد هتضيع بصمت، ومفيش استثناء ولا تحذير. ده باج مالي حقيقي، مش نظري: عشان كده أي كيان "ليه هوية وبيتغيّر وبيتشارك" (Entity في مصطلحات الـ DDD) <b>لازم</b> يكون class.</p></div>
+
+<div class="note senior"><b>ملاحظة سينيور: السؤال الحقيقي مش الحجم</b>
+<p>المبتدئ بيسأل "هو صغير؟" والسينيور بيسأل: <b>"لو اتعمله نسخة، هل النسخة المفروض تتصرف كأصل مستقل، ولا لازم تفضل هي نفسها؟"</b> Value (اللون، الإحداثيات، الأبعاد) → نسخة مستقلة منطقية → struct. Entity (الحساب، العربية، الطالب، العربة) → لازم تفضل نفس الكيان أينما راحت → class. الحجم شرط ثانوي (لو Entity كبير الحجم برضه، هو لسه class لأن الهوية أهم من الحجم).</p></div>
+</section>
+
+<!-- ===================== 4. INHERITANCE ===================== -->
+<section id="inherit">
+<div class="risk-h"><span class="tag">شرايح 13 – 18</span><h2>4) Inheritance</h2></div>
+
+<div class="note analogy"><b>تشبيه</b>عقد الإيجار العام لمبنى (الأب) بيحدد قواعد عامة (مواعيد النظافة، استخدام المصعد)، وكل شقة (الابن) ليها قواعدها الإضافية الخاصة. سكان الشقق ملتزمين بقواعد المبنى تلقائيًا، وممعندهمش خيار "ما يطبقوهاش".</div>
+
+<h3>4.1) ليه الـ Inheritance موجود؟ (المشكلة الحقيقية في الشريحة 16)</h3>
+<div class="note why"><b>المشكلة</b>
+<p>الشريحة 16 وضّحت المشكلة بشكل ممتاز: <code>Employee</code> و<code>Student</code> بيتشاركوا <code>Id</code>، <code>Name</code>، <code>Age</code>، <code>GetBirthYear()</code>. من غير Inheritance، أي تعديل في منطق <code>GetBirthYear()</code> (لو مثلًا غيّرت الحساب عشان يراعي التقويم الهجري) لازم يتكرر في الكلاسين، وأي نسيان لواحد منهم = باج صامت. الـ Inheritance بينقل الملكية للمنطق المشترك لمكان واحد (<code>Person</code>)، فالتعديل يحصل مرة واحدة ويتطبق على الكل.</p></div>
+
+<h3>4.2) ليه C# ما بيدعمش Multiple Class Inheritance؟ (قرار تصميمي مش تعسفي)</h3>
+<div class="note why"><b>السبب الحقيقي: Diamond Problem + الـ CLR Object Layout</b>
+<p>لو <code>class C : A, B</code> واتنين الأب عندهم method بنفس الاسم <code>Speak()</code>، أنهي واحدة الـ <code>C</code> بيرثها؟ ده اسمه <b>The Diamond Problem</b> (لو A وB كمان بيرثوا من جد مشترك D، بيتعقد أكتر). ولغات زي C++ حلّتها بقواعد معقدة (virtual inheritance) لسه بتسبب لخبطة للمبرمجين. الـ CLR designers اختاروا يمنعوها بالكامل، ووفروا بديل أنضف: <b>interfaces</b> (تقدر تطبق أكتر من واحدة، لأنها عقد مش تنفيذ) وConcept الـ Composition (تحط object من نوع تاني كـ field بدل ما ترث منه).</p></div>
+<div class="tw"><table>
+<tr><th>عايز تحققه</th><th>الأداة</th></tr>
+<tr><td>سلوك مشترك من مصدر واحد + تخصيص</td><td>Single Inheritance (زي الشرايح)</td></tr>
+<tr><td>"عقد" (توقيع methods) من أكتر من مصدر</td><td>Interfaces (تقدر تطبق أكتر من واحدة)</td></tr>
+<tr><td>إعادة استخدام سلوك من كلاسين مختلفين بلا علاقة IS-A</td><td>Composition (الـ class يحتوي على instance من التاني كـ field)</td></tr>
+</table></div>
+
+<h3>4.3) الأنواع التلاتة (الشريحة 14): كلهم في الحقيقة نفس الآلية</h3>
+<p>الشريحة رسمت Single وMultilevel وHierarchical كأنواع منفصلة، لكن ميكانيكيًا هما نفس القاعدة: <b>كل class ليه أب واحد بالظبط</b> (أو <code>object</code> ضمنيًا لو ما كتبتش <code>:</code>). الفرق شكل الشجرة بس:</p>
+<ul>
+<li><b>Single:</b> <code>B : A</code>. أبسط حالة.</li>
+<li><b>Multilevel:</b> <code>C : B : A</code>. سلسلة، والـ C بيرث من B اللي وارث من A (يعني C بترث الاتنين).</li>
+<li><b>Hierarchical:</b> <code>B : A</code> و<code>C : A</code> و<code>D : A</code>. أكتر من ابن لنفس الأب (زي مثال Student/Employee : Person).</li>
+</ul>
+<div class="note prod"><b>في الإنتاج: خطر الـ Multilevel العميقة</b>سلسلة وراثة طويلة (<code>E : D : C : B : A</code>) بتخلي الكود صعب التتبع: لازم تفتح 5 ملفات عشان تفهم من فين جاية method معينة. القاعدة الشائعة: تجنب أكتر من 2-3 مستويات وراثة، وفكّر في composition بدلًا من كده لو حسيت إنك بتضيف مستوى رابع.</div>
+
+<h3>4.4) <code>: base</code> ليست وراثة "أوتوماتيك" بلا تكلفة</h3>
+<div class="note senior"><b>ملاحظة سينيور</b>
+<p>كل member بترثه من الأب ("مجاني" ظاهريًا) بيصبح جزء من الـ <b>عقد العام</b> بتاع الابن. لو غيّرت حاجة في الأب، كل الأبناء بيتأثروا فورًا (كويس لو مقصود، وخطر لو مش متوقع). عشان كده مبدأ <b>"Favor Composition Over Inheritance"</b> شائع جدًا في التصميم الحديث: الوراثة بتخلق ارتباط قوي (tight coupling) بين الابن والأب، بينما الـ composition بتخلي العلاقة أرخى وأسهل تتغيّر لاحقًا.</p></div>
+</section>
+
+<!-- ===================== 5. CONSTRUCTORS + INHERITANCE ===================== -->
+<section id="ctorinherit">
+<div class="risk-h"><span class="tag">شرايح 19 – 20</span><h2>5) Constructors مع Inheritance</h2></div>
+
+<div class="note analogy"><b>تشبيه</b>بناء عمارة: لازم الأساس (constructor الأب) يخلص أولًا وبعدين تبني الدور اللي فوقه (constructor الابن). مستحيل تبني الدور التاني قبل ما الأساس يكون جاهز.</div>
+
+<h3>5.1) الشريحة 19-20: دقيقة 100%، وهنزيد عليها الآلية</h3>
+<div class="note why"><b>الميكانيزم: ليه الأب لازم يجري الأول؟</b>
+<p>الابن ممكن يستخدم (أو يعمل override لـ) members ورثها من الأب. لو الابن بدأ ينفذ الأول، ممكن يحاول يستخدم حاجة الأب لسه ما جهزهاش. عشان كده الـ CLR بيفرض القاعدة: <b>constructor الأب لازم يخلص كامل قبل ما جسم constructor الابن يبدأ ينفذ</b>. ده امتداد لقاعدة ترتيب التهيئة اللي شرحناها في سيشن 1 (قسم 3.3)، لكن هنا صريح بـ <code>: base(name)</code>.</p></div>
+
+<h3>5.2) إيه اللي بيحصل لو ما كتبتش <code>: base(...)</code> أصلًا؟</h3>
+<pre class="neutral" data-l="الحالة الضمنية"><code>class Person
+{
+    public Person() { Console.WriteLine("Person()"); }       // parameterless
+}
+class Student : Person
+{
+    public Student(string name) { Console.WriteLine("Student(name)"); }
+    // من غير : base(...) --- المترجم بيحط : base() ضمنيًا (بينادي parameterless بتاع الأب)
+}
+new Student("Ali");
+// Output: Person()
+//         Student(name)</code></pre>
+<pre class="bad" data-l="لو الأب مالوش parameterless constructor"><code>class Person
+{
+    public Person(string name) { }     // مفيش parameterless
+}
+class Student : Person
+{
+    public Student(string name) { }    // ❌ CS1729: 'Person' does not contain a constructor that takes 0 arguments
+}
+// لازم تكتب صراحة: public Student(string name) : base(name) { }</code></pre>
+<div class="note myth"><b>مفهوم غلط: "الشريحة 20 قالت لازم تستخدم base(...) لو الأب مالوش parameterless"</b>
+<p>ده صحيح 100% وهو نفس اللي بيقوله الـ compiler error <code>CS1729</code>. الإضافة المهمة: القاعدة مش "لازم تكتب <code>base(...)</code> دايمًا"، القاعدة هي "المترجم بيحاول ينادي <code>base()</code> الفاضي ضمنيًا، وبيديك error بس لو مش موجود". فلو الأب عنده parameterless constructor، مش لازم تكتب <code>base()</code> أصلًا (زي المثال الأول فوق).</p></div>
+
+<h3>5.3) ليه الـ Constructors مش بتتورّث؟ (النقطة الأولى في "Important Notes")</h3>
+<div class="note why"><b>السبب التصميمي</b>
+<p>الـ constructor بيؤسس invariants <b>خاصة بالـ class اللي هو فيه بالظبط</b>. لو الـ constructors كانت بتتورّث زي الـ methods العادية، الابن ممكن يتعمله instance من غير ما أي كود يشتغل على الحقول اللي الابن نفسه ضافها. لازم كل class يعلن صراحةً "أنا محتاج المعلومات دي عشان أتأسس صح"، وده بالظبط عكس الفكرة اللي بعض اللغات التانية (زي Kotlin بالـ primary constructor delegation) بتحاول تبسّطها، لكن على حساب الوضوح ده.</p></div>
+
+<h3>5.4) فخ نادر لكنه موجود: <code>virtual</code> call من constructor الأب</h3>
+<p>ده امتداد لتحذير سيشن 1 (قسم 3.3)، لكن الآن بسيناريو Inheritance حقيقي زي الشريحة:</p>
+<pre class="bad" data-l="فخ: الأب بينادي virtual method قبل ما الابن يخلّص تأسيسه"><code>class Person
+{
+    public Person() { Describe(); }              // بينادي override بتاع الابن من جوه constructor الأب!
+    protected virtual void Describe() =&gt; Console.WriteLine("Person");
+}
+class Student : Person
+{
+    private string _major = "Unknown";
+    public Student(string major) { _major = major; }   // لسه ما اتنفذش وقت ما Describe اتنادت
+    protected override void Describe() =&gt; Console.WriteLine($"Student majoring in {_major}");
+}
+new Student("CS");   // بيطبع "Student majoring in Unknown" مش "CS" ولا حتى default الحقيقي!</code></pre>
+<div class="note prod"><b>في الإنتاج</b>ده باج بيظهر بس في سيناريو inheritance حقيقي (زي الـ Person/Student بتاع الشريحة)، وبيبان "عشوائي" لأنه بيعتمد على ترتيب تنفيذ التهيئة. القاعدة: <b>الأب ما ينادّيش <code>virtual</code> methods من الـ constructor بتاعه</b>.</div>
+</section>
+
+<!-- ===================== 6. ACCESS MODIFIERS ===================== -->
+<section id="access">
+<div class="risk-h"><span class="tag">شرايح 21 – 30</span><h2>6) Access Modifiers (الستة كاملين)</h2></div>
+
+<div class="note analogy"><b>تشبيه</b>شركة فيها فروع (assemblies) وموظفين وأبناء إدارات (derived classes):
+<ul>
+<li><code>public</code> = لوحة إعلانات في الشارع، أي حد يشوفها.</li>
+<li><code>internal</code> = لوحة داخل مبنى فرع واحد، موظفين الفرع ده بس.</li>
+<li><code>protected</code> = معلومة بتتوّرث للأقسام الفرعية التابعة لإدارة معينة، أينما كانت (حتى لو في فرع تاني).</li>
+<li><code>private</code> = ورقة في دُرج مكتبك، محدش غيرك يشوفها.</li>
+<li><code>protected internal</code> = معلومة متاحة لكل حد في الفرع، <b>أو</b> لأي قسم فرعي تابع حتى لو في فرع تاني (OR).</li>
+<li><code>private protected</code> = معلومة للأقسام الفرعية التابعة <b>وبس لو في نفس الفرع</b> (AND).</li>
+</ul></div>
+
+<h3>6.1) جداول الشرايح 23 و27 دقيقة جدًا، هنشرح الآلية اللي وراهم</h3>
+<div class="note why"><b>الميكانيزم: الـ CLR بيخزّن الـ modifiers دي كـ flags في الـ metadata</b>
+<p>الـ CLR (مش C# فقط) عنده مصطلحات داخلية: <code>Public</code>، <code>Private</code>، <code>Family</code> (= protected)، <code>Assembly</code> (= internal)، <code>FamORAssem</code> (= protected internal، أي "family OR assembly")، و<code>FamANDAssem</code> (= private protected، أي "family AND assembly"). الاسمين الأخيرين بيوضحوا بالظبط ليه <code>protected internal</code> بيشتغل بمنطق <b>OR</b> (أوسع) و<code>private protected</code> بيشتغل بمنطق <b>AND</b> (أضيق): دول أسماء العملية المنطقية نفسها في الـ CLR. <code>private protected</code> اتضاف متأخر (C# 7.2) لأن دمج الـ flag ده احتاج وقت يتعرض في اللغة رغم إن الـ CLR كان يدعمه من زمان.</p></div>
+
+<h3>6.2) الفخ اللي مفيش أي شريحة ذكرته: <code>protected</code> عن طريق نوع الأب ممنوع</h3>
+<p>الجداول في الشرايح 23 و27 بتقول "protected: Accessible in Derived Class ✅". صحيح، لكن فيه شرط دقيق جدًا محدّش بيتوقعه، ومصدره الرسمي (Microsoft Learn) بيوضحه:</p>
+<pre class="bad" data-l="CS1540: مينفعش توصل لـ protected عن طريق reference من نوع الأب"><code>class BaseClass { protected int MyValue = 123; }
+
+class DerivedClass : BaseClass
+{
+    static void Main()
+    {
+        var baseObject = new BaseClass();
+        var derivedObject = new DerivedClass();
+
+        // baseObject.MyValue = 10;      // ❌ CS1540: الوصول لازم يتم عن طريق نوع الابن، مش نوع الأب
+        derivedObject.MyValue = 10;      // ✅ تمام: عن طريق نوع الابن
+    }
+}</code></pre>
+<div class="note why"><b>ليه القاعدة دي موجودة؟</b>
+<p>لو <code>DerivedClass</code> يقدر يوصل لـ <code>MyValue</code> عن طريق <b>أي</b> متغير من نوع <code>BaseClass</code>، يبقى فعليًا يقدر يعدّل حالة أي <code>BaseClass</code> تاني في الـ برنامج (حتى واحد مش من نوعه هو)، وده بيكسر الغرض من <code>protected</code> أصلًا (إنها محصورة في عيلة الوراثة بتاعتك). القاعدة بتضمن إنك بس تقدر تلمس <code>protected</code> members الخاصة <b>بالـ instance بتاعك أو أبناء نوعك</b>، مش أي instance تاني من نوع الأب أو من نوع أخ ليك (sibling class).</p></div>
+<div class="note prod"><b>في الإنتاج</b>ده error بيقابل أي حد بيحاول يعمل method جوه class مشتق بتاخد parameter من نوع الأب وتحاول توصل لـ protected member منه. الحل: خلي الـ parameter من نوع الابن، أو اعمل الوصول عن طريق method عامة (public/protected) في الأب بترجع القيمة.</div>
+
+<h3>6.3) الجدول الموحّد: الستة Access Modifiers</h3>
+<div class="tw"><table>
+<tr><th>Modifier</th><th>نفس الـ Class</th><th>نفس الـ Assembly</th><th>Derived (نفس الـ assembly)</th><th>Derived (assembly تانية)</th><th>مصطلح الـ CLR</th></tr>
+<tr><td><code>public</code></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td><code>Public</code></td></tr>
+<tr><td><code>protected internal</code></td><td>✅</td><td>✅</td><td>✅</td><td>✅ (لو derived)</td><td><code>FamORAssem</code></td></tr>
+<tr><td><code>internal</code></td><td>✅</td><td>✅</td><td>✅ (لأنه نفس الـ assembly)</td><td>❌</td><td><code>Assembly</code></td></tr>
+<tr><td><code>protected</code></td><td>✅</td><td>❌ (لو مش derived)</td><td>✅ (عن طريق نوع الابن بس، 6.2)</td><td>✅ (نفس الشرط)</td><td><code>Family</code></td></tr>
+<tr><td><code>private protected</code></td><td>✅</td><td>❌</td><td>✅ (نفس الشرط + نفس الـ assembly)</td><td>❌</td><td><code>FamANDAssem</code></td></tr>
+<tr><td><code>private</code></td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td><code>Private</code></td></tr>
+</table></div>
+
+<h3>6.4) "protected internal = internal OR protected" (Key Idea في الشريحة 29): تفكيك المنطق</h3>
+<p>الشريحة قالت الجملة دي وهي صح تمامًا. نفكّكها لحالتين عمليتين:</p>
+<div class="tw"><table>
+<tr><th>مين بيحاول يوصل؟</th><th>protected internal بيتصرف زي إيه؟</th></tr>
+<tr><td>كود في نفس الـ assembly (مش وارث)</td><td>زي <code>internal</code> بالظبط: مسموح</td></tr>
+<tr><td>class وارث في assembly تانية</td><td>زي <code>protected</code> بالظبط (وبنفس قيد 6.2): مسموح عن طريق نوع الابن</td></tr>
+<tr><td>class مش وارث في assembly تانية</td><td>ممنوع (مش OR الاتنين ينطبقوا هنا)</td></tr>
+</table></div>
+
+<h3>6.5) قرار عملي: امتى تستخدم كل واحد؟</h3>
+<div class="tw"><table>
+<tr><th>الاحتياج</th><th>الاختيار</th></tr>
+<tr><td>API عام للمكتبة، أي حد يستخدمه</td><td><code>public</code></td></tr>
+<tr><td>تفاصيل تنفيذ داخلية، محدش برّه الـ class يلمسها</td><td><code>private</code> (الافتراضي لو معملتش حاجة)</td></tr>
+<tr><td>مشترك بين ملفات نفس المشروع بس (زي helper classes داخلية)</td><td><code>internal</code></td></tr>
+<tr><td>لازم يوصله الأبناء بس، حتى لو في NuGet package مختلف</td><td><code>protected</code></td></tr>
+<tr><td>مسموح جوه الفريق (نفس المشروع) لأي حد، وبرّه بس للأبناء</td><td><code>protected internal</code></td></tr>
+<tr><td>مسموح للأبناء بس، وبس لو داخل نفس المشروع (أضيق حالة وراثة)</td><td><code>private protected</code></td></tr>
+</table></div>
+
+<div class="note senior"><b>ملاحظة سينيور</b>
+<ul>
+<li>الـ default في أي top-level type هو <code>internal</code> (زي ما سيشن 1 وضّح)، فلو نسيت <code>public</code> على class مكتبة، حد تاني مش هيقدر يستخدمها من برّه المشروع ومش هيبان له إنها "موجودة" أصلًا.</li>
+<li><code>[assembly: InternalsVisibleTo("MyApp.Tests")]</code> بيخلي assembly تانية (زي مشروع الاختبارات) تشوف الـ <code>internal</code> members، من غير ما تضطر تخليها <code>public</code>. مفيد جدًا للـ unit testing.</li>
+<li><code>private protected</code> نادر الاستخدام في الكود العادي، لكنه مفيد جدًا في مكتبات كبيرة بتنقسم لـ assemblies متعددة وعايزة تحكم دقيق جدًا: "الأبناء بس، وبس لو من جوانا".</li>
+</ul></div>
+</section>
+
+<!-- ===================== SLIDE NOTES ===================== -->
+<section id="slide-notes">
+<h2>ملاحظات على الشرايح</h2>
+<p>السيشن دي كانت دقيقة تقنيًا في أغلبها (خصوصًا جداول الـ Access Modifiers، وهي من أصعب الأجزاء تُشرح بدقة). الملاحظات هنا تصحيحات دقيقة/إضافات، مش أخطاء جوهرية:</p>
+<div class="tw"><table>
+<tr><th>الشريحة</th><th>الملاحظة</th></tr>
+<tr><td>6</td><td>"CLR Will Allocate 4 | 8 bytes ... Depend on OS": الأدق إنه يعتمد على <b>معمارية الـ process</b> (x86/x64/ARM64) مش الـ OS مباشرة (6.1)</td></tr>
+<tr><td>6 – 8</td><td>العناوين (<code>0x001</code>) تبسيط تعليمي ممتاز، لكن لازم تعرف إنها مش ثابتة فعليًا: الـ Compacting GC ممكن ينقل الـ objects (1.3)</td></tr>
+<tr><td>11</td><td>"struct: Always exists (parameterless constructor)": صحيح كسلوك نهائي، لكن كتابتها بنفسك محتاجة C# 10+ (3.1 في سيشن 1، و3.1 هنا)</td></tr>
+<tr><td>12</td><td>الإجابات كلها صح، لكن السبب "ليه" مش موضّح في الشريحة (خصوصًا Bank Account). شرحناه بالتفصيل في القسم 3</td></tr>
+<tr><td>23، 27، 29</td><td>الجداول دقيقة جدًا، لكن ناقصهم تفصيلة <code>CS1540</code> (الوصول لـ <code>protected</code> عن طريق نوع الأب ممنوع). شرحناها في 6.2</td></tr>
+<tr><td>19</td><td>الكود دقيق تمامًا. الإضافة الوحيدة: توضيح إيه اللي بيحصل لو محذفتش <code>: base(name)</code> (5.2)</td></tr>
+</table></div>
+</section>
+
+<!-- ===================== INTERVIEW ===================== -->
+<section id="interview">
+<h2>أسئلة مقابلات (مع الإجابات)</h2>
+
+<details><summary>1) إيه الفرق بين تخزين reference type وvalue type جوه نفس الـ object؟</summary>
+<p>الـ value type field بيتخزن مباشرة جوه بايتات الـ object. الـ reference type field بيتخزن كـ عنوان (pointer) بيأشر على object منفصل على الـ heap. الاتنين ممكن يتخزنوا جوه نفس الـ object لكن بآليتين مختلفتين تمامًا.</p></details>
+
+<details><summary>2) هل عنوان الـ object في الميموري ثابت طول عمره؟</summary>
+<p>لأ. الـ Compacting Garbage Collector ممكن ينقل الـ object فعليًا في الميموري وقت الـ collection عشان يقفل الفراغات. الـ references بتتحدّث تلقائيًا، فكودك مش حاسس، لكن العنوان الفعلي بيتغيّر. عشان كده فيه <code>fixed</code> وGCHandle.Pinned لما تحتاج تبعت عنوان لكود native.</p></details>
+
+<details><summary>3) ليه C# مبيدعمش multiple class inheritance؟</summary>
+<p>عشان الـ Diamond Problem: لو class ورث من اتنين وكل واحد فيهم عنده method بنفس الاسم، هتبقى غامضة أنهي واحدة تتنفذ. البديل: interfaces (تقدر تطبق أكتر من واحد لأنها عقد مش تنفيذ) وcomposition.</p></details>
+
+<details><summary>4) لو عندي class B : A وB نفسه ماكتبش أي constructor، إيه اللي بيحصل لما أعمل new B()؟</summary>
+<p>لو A عنده parameterless constructor، الـ compiler بيولّد default constructor لـ B بيستدعي base() ضمنيًا. لو A مالوش parameterless constructor، الكود مبيتعملوش compile أصلًا (لازم B يكتب constructor صريح بـ base(...)).</p></details>
+
+<details><summary>5) ليه الـ constructors مش بتتورّث؟</summary>
+<p>لأن كل constructor بيؤسس invariants خاصة بالـ class بتاعه بالظبط، وبيحتاج معلومات قد تكون مختلفة عن أبوه. لو اتورّثت، الابن ممكن يتعمله instance من غير ما أي كود يهتم بالحقول اللي هو نفسه ضافها.</p></details>
+
+<details><summary>6) إيه الفرق بين protected internal وprivate protected؟</summary>
+<p>protected internal = (نفس الـ assembly) OR (derived class في أي assembly). private protected = (derived class) AND (نفس الـ assembly) معًا. الأول أوسع (union)، والتاني أضيق (intersection).</p></details>
+
+<details><summary>7) ليه الكود ده بيرمي CS1540؟
+<pre class="neutral" data-l="مثال السؤال" style="margin-top:.5rem"><code>class B : A { void M(A a) { a.ProtectedField = 1; } }</code></pre></summary>
+<p>لأن الوصول لـ protected member لازم يتم عن طريق reference من نوع الابن (B) أو نوع مشتق منه، مش عن طريق reference من نوع الأب (A). لو الـ parameter كان من نوع B، كان هيشتغل عادي.</p></details>
+
+<details><summary>8) ليه Bank Account لازم تكون class مش struct؟</summary>
+<p>لأنها Entity ليها هوية وحالة بتتغيّر (الرصيد) ولازم كل جزء من النظام يتعامل مع نفس الحساب فعليًا. لو كانت struct، كل تمرير أو تخزين للحساب هيعمل نسخة مستقلة، وأي تعديل على الرصيد في method أو list هيضيع بمجرد ما نطاقه ينتهي.</p></details>
+
+<details><summary>9) هل <code>==</code> بين اتنين instances من نفس الـ class بيقارن المحتوى؟</summary>
+<p>لأ افتراضيًا. <code>==</code> على reference type بيقارن العناوين (reference equality)، إلا لو الـ class عمل override للـ <code>==</code> والـ <code>Equals</code> (زي الـ <code>string</code> اللي بيعمل value equality رغم إنه reference type).</p></details>
+
+<details><summary>10) إيه الفرق بين Single وMultilevel وHierarchical inheritance؟</summary>
+<p>كلهم نفس الآلية (كل class ليه أب واحد). Single: B:A. Multilevel: سلسلة C:B:A. Hierarchical: أكتر من ابن لنفس الأب (B:A وC:A). الفرق شكل الشجرة بس، مش قاعدة لغوية مختلفة.</p></details>
+</section>
+
+<!-- ===================== EXERCISES ===================== -->
+<section id="exercises">
+<h2>تمارين (اكتب الكود بإيدك)</h2>
+<div class="tw"><table>
+<tr><th>#</th><th>التمرين</th><th>تلميح</th></tr>
+<tr><td>1</td><td>اعمل <code>class Counter</code> بميثود <code>Increment()</code>. مرره لـ method بتنادي <code>Increment()</code> عشرة مرات، واطبع القيمة النهائية من الكود الأصلي. لاحظ إن التعديل وصل للأصل (aliasing).</td><td>ربط مع القسم 2.2</td></tr>
+<tr><td>2</td><td>اعمل <code>class Base</code> فيه <code>protected int Value</code>، و<code>class Derived : Base</code> فيها method بتاخد <code>Base</code> كـ parameter وتحاول توصل لـ <code>Value</code>. شوف الـ <code>CS1540</code> بعينك، وأصلحه.</td><td>القسم 6.2</td></tr>
+<tr><td>3</td><td>اعمل hierarchy: <code>Person</code> (أب) و<code>Teacher</code> و<code>Student</code> (أبناء). الأب مالوش parameterless constructor. جرّب تعمل <code>Student</code> من غير <code>: base(...)</code> وشوف الـ error، بعدين أصلحه.</td><td>القسم 5.2</td></tr>
+<tr><td>4</td><td>اعمل <code>class Person</code> بـ constructor بينادي method <code>virtual</code>، وclass وارث بيعمل override ليها ويستخدم field جديد. شوف إزاي الـ output بيبقى غلط (فخ 5.4).</td><td>القسم 5.4</td></tr>
+<tr><td>5</td><td>صمم نظام بسيط لمكتبة: <code>Book</code> (struct ولا class؟)، <code>Library</code> (بتحتوي على List من Book)، <code>Member</code> (struct ولا class؟). دافع عن كل قرار بجملة واحدة باستخدام معيار "الهوية مقابل القيمة" من القسم 3.2.</td><td>القسم 3.2</td></tr>
+<tr><td>6</td><td>اعمل 3 classes في نفس الـ assembly: <code>Base</code> فيه عضو من كل الأنواع الستة، و<code>Derived : Base</code>، و<code>Unrelated</code> (مش وارث). اكتب جدول توقعاتك الشخصي الأول، بعدين جرب فعليًا وقارن.</td><td>القسم 6.3</td></tr>
+</table></div>
+</section>
+
+<!-- ===================== CHEAT SHEET ===================== -->
+<section id="cheat">
+<h2>Cheat Sheet: قرارات سريعة</h2>
+
+<h3>هل ده Entity (class) ولا Value (struct)؟</h3>
+<div class="tw"><table>
+<tr><th>اسأل</th><th>لو الإجابة أيوه</th></tr>
+<tr><td>ليه هوية مميزة (رقم، ID) مش مجرد قيمته؟</td><td>class</td></tr>
+<tr><td>حالته بتتغيّر بمرور الوقت وكل حد لازم يشوف نفس التغيير؟</td><td>class</td></tr>
+<tr><td>لو اتعمله نسخة، النسخة المفروض تكون مستقلة تمامًا؟</td><td>struct</td></tr>
+<tr><td>حجمه صغير (أقل من ~16 bytes) وimmutable منطقيًا؟</td><td>struct</td></tr>
+<tr><td>مش متأكد؟</td><td>class (القاعدة الافتراضية في C#)</td></tr>
+</table></div>
+
+<h3>Access Modifier: اختار الأضيق اللي يفي بالغرض</h3>
+<ol>
+<li>ابدأ بـ <code>private</code> افتراضيًا.</li>
+<li>لو محتاج الأبناء يوصلوا → <code>protected</code>.</li>
+<li>لو محتاج باقي المشروع يوصل → <code>internal</code>.</li>
+<li>لو محتاج الاتنين (أبناء في أي مكان + باقي المشروع) → <code>protected internal</code>.</li>
+<li>لو محتاج الأبناء بس وبس لو داخل نفس المشروع → <code>private protected</code>.</li>
+<li>لو ده API عام للمكتبة/التطبيق → <code>public</code> (وده الوحيد اللي بيعدّي حدود الـ assembly بحرية كاملة).</li>
+</ol>
+
+<h3>Constructor + Inheritance Checklist</h3>
+<ol>
+<li>لو الأب مالوش parameterless constructor: هل كتبت <code>: base(...)</code> صراحة في كل constructor بالابن؟</li>
+<li>هل فيه virtual call جوه أي constructor؟ (لازم لأ)</li>
+<li>هل الترتيب اللي في دماغك مطابق للترتيب الفعلي (field initializers الابن → field initializers الأب → constructor الأب → constructor الابن)؟</li>
+</ol>
+</section>
+
+<!-- ===================== RESOURCES ===================== -->
+<section id="resources">
+<h2>المصادر</h2>
+
+<div class="note cost"><b>ملاحظة عن التحقق</b>
+<p>قاعدة الوصول لـ <code>protected</code> عن طريق نوع الابن بس (القسم 6.2، خطأ <code>CS1540</code>) <b>اتأكدت منها بالبحث</b> في مستندات Microsoft الرسمية وقت كتابة الملف. باقي الروابط تحت من معرفتي بالمصادر الرسمية ومفتحتش كل صفحة منها، فلو رابط مفتحش ابحث بعنوان الصفحة.</p></div>
+
+<h3>Microsoft Learn (المرجع الرسمي)</h3>
+<ul class="res">
+<li><b>protected (C# Reference)</b> — قاعدة الوصول عن طريق نوع الابن، والمثال بالظبط اللي في القسم 6.2<br><a class="u" href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/protected" target="_blank" rel="noopener">https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/protected</a></li>
+<li><b>Accessibility Levels (Access Modifiers)</b> — الجدول الرسمي لكل الستة modifiers<br><a class="u" href="https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/access-modifiers" target="_blank" rel="noopener">https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/access-modifiers</a></li>
+<li><b>Inheritance in C#</b><br><a class="u" href="https://learn.microsoft.com/dotnet/csharp/fundamentals/object-oriented/inheritance" target="_blank" rel="noopener">https://learn.microsoft.com/dotnet/csharp/fundamentals/object-oriented/inheritance</a></li>
+<li><b>Constructors</b> (يشمل base() وترتيب التنفيذ)<br><a class="u" href="https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/constructors" target="_blank" rel="noopener">https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/constructors</a></li>
+<li><b>Fundamentals of garbage collection</b> — الـ Compacting GC ونقل الـ objects (1.3)<br><a class="u" href="https://learn.microsoft.com/dotnet/standard/garbage-collection/fundamentals" target="_blank" rel="noopener">https://learn.microsoft.com/dotnet/standard/garbage-collection/fundamentals</a></li>
+<li><b>fixed statement</b> — تثبيت object عشان تتجنب نقل الـ GC ليه<br><a class="u" href="https://learn.microsoft.com/dotnet/csharp/language-reference/statements/fixed" target="_blank" rel="noopener">https://learn.microsoft.com/dotnet/csharp/language-reference/statements/fixed</a></li>
+<li><b>InternalsVisibleTo attribute</b><br><a class="u" href="https://learn.microsoft.com/dotnet/api/system.runtime.compilerservices.internalsvisibletoattribute" target="_blank" rel="noopener">https://learn.microsoft.com/dotnet/api/system.runtime.compilerservices.internalsvisibletoattribute</a></li>
+<li><b>Equality comparisons</b> — <code>==</code> مقابل <code>Equals</code> مقابل <code>ReferenceEquals</code> (2.3)<br><a class="u" href="https://learn.microsoft.com/dotnet/csharp/programming-guide/statements-expressions-operators/equality-comparisons" target="_blank" rel="noopener">https://learn.microsoft.com/dotnet/csharp/programming-guide/statements-expressions-operators/equality-comparisons</a></li>
+</ul>
+
+<h3>مفاهيم تصميمية</h3>
+<ul class="res">
+<li><b>Framework Design Guidelines</b>، Cwalina وAbrams<small>نفس مصدر سيشن 1، فيه فصل كامل عن قرارات الـ inheritance.</small></li>
+<li><b>Design Patterns: Elements of Reusable Object-Oriented Software</b>، Gang of Four<small>مصدر مبدأ "Favor Composition Over Inheritance" (4.4).</small></li>
+<li><b>CLR via C#</b>، Jeffrey Richter<small>تفاصيل الـ CLR flags (Family, Assembly, FamORAssem, FamANDAssem) من مصدرها.</small></li>
+</ul>
+
+<h3>أدوات</h3>
+<ul class="res">
+<li><b>SharpLab</b> — شوف الـ IL بتاع <code>base()</code> الضمنية، وflags الـ access modifiers في الـ metadata<br><a class="u" href="https://sharplab.io" target="_blank" rel="noopener">https://sharplab.io</a></li>
+</ul>
+</section>
+
+<!-- ===================== NEXT ===================== -->
+<section id="next">
+<h2>الخطوة الجاية</h2>
+<ol>
+<li><b>Polymorphism (virtual/override/sealed):</b> الآلية الحقيقية (Method Table، vtable slots)، وليه <code>new</code> على method مختلف عن <code>override</code>، وليه sealed method أسرع أحيانًا.</li>
+<li><b>Abstract Classes مقابل Interfaces:</b> امتى تستخدم كل واحد، وdefault interface methods (C# 8) وتعقيد الـ diamond معاها.</li>
+<li><b>Equality في .NET:</b> عقد <code>Equals</code>/<code>GetHashCode</code>/<code>IEquatable&lt;T&gt;</code>، وليه <code>==</code> على الـ string بتشتغل كـ value (ربط مباشر بقسم 2.3 هنا).</li>
+<li><b>Object Pinning والـ GC العميق:</b> تفاصيل الـ Generations، الـ compaction، وليه الـ pinning بيأثر على أداء الـ GC.</li>
+<li><b>Composition over Inheritance عمليًا:</b> أمثلة حقيقية إزاي composition بتحل مشاكل كانت هتتحل بالوراثة بشكل أنضف.</li>
+</ol>
+<p>قولي أي واحد منهم تحب ننزل فيه بنفس الأسلوب. المنطقي جدًا بعد السيشن دي هو <b>Polymorphism</b>، لأن كل الأساس (Inheritance + Access Modifiers) جاهز له دلوقتي.</p>
+</section>
+
+<footer>
+  آخر تحديث: 28 سبتمبر 2026. مبني على شرايح OOP Session 02. الأكواد تعليمية ومختصرة، وماتجرّبتش على compiler وقت الكتابة: جرّبها بنفسك قبل ما تعتمد عليها.
+</footer>
+
+</main>
+</div>
+</body>
+</html>

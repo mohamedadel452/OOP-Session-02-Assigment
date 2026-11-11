@@ -1,3 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+    <File Path="Study_Guide/OOP_Session02_Deep_Dive.html" />
+  </Folder>
   <Project Path="OOP – Session 02-Assigment/OOP – Session 02-Assigment.csproj" />
 </Solution>
